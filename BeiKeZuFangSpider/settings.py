@@ -29,6 +29,9 @@ MONGODB_PASS = ""
 MONGODB_DB_NAME = "BeiKeData"
 MONGODB_COL_NAME = "ZuFang"
 
+# CSV导出
+CSV_EXPORTER = True
+
 # Disable Telnet Console (enabled by default)
 TELNETCONSOLE_ENABLED = False
 
@@ -47,7 +50,7 @@ TELNETCONSOLE_ENABLED = False
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   # 'BeiKeZuFangSpider.middlewares.BeikezufangspiderDownloaderMiddleware': 543,
+    # 'BeiKeZuFangSpider.middlewares.BeikezufangspiderDownloaderMiddleware': 543,
     'scrapy.downloadermiddleware.useragent.UserAgentMiddleware': None,
     'BeiKeZuFangSpider.middlewares.BeiKeZuFangScrapyUserAgentMiddleware': 400,
 }
@@ -61,7 +64,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'BeiKeZuFangSpider.pipelines.BeikezufangspiderPipeline': 300,
+    'BeiKeZuFangSpider.pipelines.BeikezufangspiderPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
