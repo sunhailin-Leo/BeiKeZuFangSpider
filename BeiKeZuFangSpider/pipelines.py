@@ -18,14 +18,21 @@ logger = logging.getLogger(__name__)
 class BeikezufangspiderPipeline(object):
     def __init__(self):
         """
-        MongoDB的配置
+        Pipeline的配置
         """
+        # MongoDB配置
         self._host = settings.get("MONGODB_HOST")
         self._port = settings.get("MONGODB_PORT")
         self._user = settings.get("MONGODB_USER")
         self._pass = settings.get("MONGODB_PASS")
         self._db_name = settings.get("MONGODB_DB_NAME")
         self._col_name = settings.get("MONGODB_COL_NAME")
+
+        # Kafka配置
+        self._is_kafka = settings.get("KAFKA_PIPELINE")
+        if self._is_kafka:
+            self._kafka_hosts = settings.get("KAFKA_IP_PORT")
+            self._kafka_topic = settings.get("KAFKA_TOPIC_NAME")
 
         # 初始化
         self.client = None
@@ -35,19 +42,25 @@ class BeikezufangspiderPipeline(object):
 
         # csv文件的位置,无需事先创建
         self._is_csv = settings.get("CSV_EXPORTER")
-        self.csv_file = None
-        self._csv_header = [
-            "区域",
-            "租房链接",
-            "房源名称",
-            "房屋基本信息",
-            "房屋来源",
-            "发布时间",
-            "房屋特点",
-            "最低价(元/月)",
-            "最高价(元/月)"
-        ]
-        self._store_file = './ExportData/export_{}.csv'.format(str(uuid.uuid4()).replace("-", ""))
+        if self._is_csv:
+            self._csv_path = settings.get("CSV_DEFAULT_PATH")
+            self.csv_file = None
+            self._csv_header = [
+                "区域",
+                "租房链接",
+                "房源名称",
+                "房屋基本信息",
+                "房屋来源",
+                "发布时间",
+                "房屋特点",
+                "最低价(元/月)",
+                "最高价(元/月)"
+            ]
+            self._store_file = \
+                '{}export_{}.csv'.format(
+                    self._csv_path,
+                    str(uuid.uuid4()).replace("-", "")
+                )
 
     def open_spider(self, spider):
         """
@@ -120,5 +133,8 @@ class BeikezufangspiderPipeline(object):
                 data_tail = [int(d.replace("元/月", "")) for d in data_tail]
                 data.extend(data_tail)
                 # 写入数据
-                self.csv_file.writerow(data)
+                try:
+                    self.csv_file.writerow(data)
+                except UnicodeEncodeError:
+                    logger.debug("解码错误!存在特殊符号无法解码!URL:{}".format(data[1]))
                 return item

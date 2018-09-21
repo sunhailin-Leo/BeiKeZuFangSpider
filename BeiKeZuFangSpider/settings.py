@@ -21,6 +21,13 @@ ROBOTSTXT_OBEY = True
 # Disable cookies (enabled by default)
 # COOKIES_ENABLED = False
 
+# KAFKA配置
+KAFKA_PIPELINE = True
+# KAFKA的访问ip或者端口（默认localhost:9092）
+KAFKA_IP_PORT = ["localhost:9092"]
+# Kafka的Topic name
+KAFKA_TOPIC_NAME = "BeiKeZuFang"
+
 # MONGODB配置
 MONGODB_HOST = "127.0.0.1"
 MONGODB_PORT = 27017
@@ -31,6 +38,7 @@ MONGODB_COL_NAME = "ZuFang"
 
 # CSV导出
 CSV_EXPORTER = True
+CSV_DEFAULT_PATH = "./ExportData/"
 
 # Disable Telnet Console (enabled by default)
 TELNETCONSOLE_ENABLED = False
@@ -50,7 +58,6 @@ TELNETCONSOLE_ENABLED = False
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    # 'BeiKeZuFangSpider.middlewares.BeikezufangspiderDownloaderMiddleware': 543,
     'scrapy.downloadermiddleware.useragent.UserAgentMiddleware': None,
     'BeiKeZuFangSpider.middlewares.BeiKeZuFangScrapyUserAgentMiddleware': 400,
 }
