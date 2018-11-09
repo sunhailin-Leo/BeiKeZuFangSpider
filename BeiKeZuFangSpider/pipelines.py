@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import csv
+import json
 import uuid
 import logging
 
@@ -11,11 +12,14 @@ from pymongo.errors import ConnectionFailure
 # Scrapy
 from scrapy.conf import settings
 
+# PyKafka
+from pykafka import KafkaClient
+
 # 日志
 logger = logging.getLogger(__name__)
 
 
-class BeikezufangspiderPipeline(object):
+class BeiKeZuFangSpiderPipeline(object):
     def __init__(self):
         """
         Pipeline的配置
@@ -27,12 +31,6 @@ class BeikezufangspiderPipeline(object):
         self._pass = settings.get("MONGODB_PASS")
         self._db_name = settings.get("MONGODB_DB_NAME")
         self._col_name = settings.get("MONGODB_COL_NAME")
-
-        # Kafka配置
-        self._is_kafka = settings.get("KAFKA_PIPELINE")
-        if self._is_kafka:
-            self._kafka_hosts = settings.get("KAFKA_IP_PORT")
-            self._kafka_topic = settings.get("KAFKA_TOPIC_NAME")
 
         # 初始化
         self.client = None
@@ -138,3 +136,50 @@ class BeikezufangspiderPipeline(object):
                 except UnicodeEncodeError:
                     logger.debug("解码错误!存在特殊符号无法解码!URL:{}".format(data[1]))
                 return item
+
+
+class BeikeZuFangSpiderKafkaPipeline(object):
+    def __init__(self):
+        # 判断下配置里面个给的是啥
+        # 1. 如果长度等于1, list只有一个数据, 如果是字符肯定大于1
+        # 2. 否则, 判断类型是否是list, 是的话用 逗号分隔
+        # 3. 否则就是一个字符串
+        kafka_ip_port = settings['KAFKA_IP_PORT']
+        if len(kafka_ip_port) == 1:
+            kafka_ip_port = kafka_ip_port[0]
+        else:
+            if isinstance(kafka_ip_port, list):
+                kafka_ip_port = ",".join(kafka_ip_port)
+            else:
+                kafka_ip_port = kafka_ip_port
+
+        # 初始化client
+        self._client = KafkaClient(hosts=kafka_ip_port)
+
+        # 初始化Producer 需要把topic name变成字节的形式
+        self._producer = \
+            self._client.topics[
+                settings['KAFKA_TOPIC_NAME'].encode(encoding="UTF-8")
+            ].get_sync_producer()
+
+    def process_item(self, item, spider):
+        """
+        写数据到Kafka
+        :param item: 数据item
+        :param spider: 爬虫对象
+        :return: 返回item的数据
+        """
+        if spider.name == "BeiKeErShouFang":
+            # item dumps转换成str并encode成字节
+            json_msg = json.dumps(item)
+            msg = json_msg.encode("UTF-8")
+            # 发送数据
+            self._producer.produce(msg)
+            return item
+
+    def close_spider(self, spider):
+        """
+        结束之后关闭Kafka
+        """
+        if spider.name == "BeiKeErShouFang":
+            self._producer.stop()

@@ -12,6 +12,9 @@ import sys
 # 调用execute这个函数可调用scrapy脚本
 from scrapy.cmdline import execute
 
+# 项目内部库
+from BeiKeZuFangSpider.settings import ITEM_PIPELINES
+
 
 def main():
     """
@@ -31,6 +34,13 @@ def main():
             metro_name = input("请输入地铁线名称:")
             print("您输入的地铁线为: {}".format(metro_name))
             area_name = ""
+        is_kafka = input("是否使用Kafka(输入Y(y)/N(n), 也可以忽略):")
+        if is_kafka != "":
+            if is_kafka.upper() == "Y":
+                print("您选择了Kafka进行PIPELINE.数据将通过Kafka进行传输.")
+                ITEM_PIPELINES.pop('BeiKeZuFangSpider.pipelines.BeiKeZuFangSpiderPipeline')
+                ITEM_PIPELINES.clear()
+                ITEM_PIPELINES['BeiKeZuFangSpider.pipelines.BeikeZuFangSpiderKafkaPipeline'] = 1
         print("城市: {}, 区域: {}, 地铁线: {}".format(city_name, area_name, metro_name))
         start_spider(city_name=city_name, area_name=area_name, metro_name=metro_name)
 

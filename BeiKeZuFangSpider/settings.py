@@ -22,7 +22,6 @@ ROBOTSTXT_OBEY = True
 # COOKIES_ENABLED = False
 
 # KAFKA配置
-KAFKA_PIPELINE = True
 # KAFKA的访问ip或者端口（默认localhost:9092）
 KAFKA_IP_PORT = ["localhost:9092"]
 # Kafka的Topic name
@@ -71,7 +70,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'BeiKeZuFangSpider.pipelines.BeikezufangspiderPipeline': 300,
+    'BeiKeZuFangSpider.pipelines.BeiKeZuFangSpiderPipeline': 1,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

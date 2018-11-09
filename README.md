@@ -46,7 +46,7 @@
 <h3 id="FutureWork">未来的开发方向</h3>
 
 1. 添加查询规则(通过配置规则进行爬取) -- 具体方案待定
-2. 加入Kafka对数据进行订阅
+~~2. 加入Kafka对数据进行订阅~~
 
 
 ---
@@ -58,5 +58,6 @@
     * 可以在配置文件中配置是否导出到CSV中(默认使用CSV导出)
     * 可以自定义路径(默认在根目录ExportData中)
     * 在判断MongoDB没有配置或者配置后首次连接无法连上, 则自动切换到CSV导出
+* 增加了Kafka pipeline的支持.(Consumer模块复杂逻辑需要自行编写, BeiKeZuFangSpider/static下提供了一个example进行参考)
 
 ---
